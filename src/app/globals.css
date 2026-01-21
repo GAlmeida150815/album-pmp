@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  /* Modern Dark Theme Palette */
+  --background: #09090b; /* Zinc-950 (Deep dark) */
+  --foreground: #fafafa; /* Zinc-50 (Crisp white) */
+  
+  /* Brand Accents (Vibrant Purple/Blue gradient feel) */
+  --primary: #8b5cf6;    /* Violet-500 */
+  --secondary: #ec4899;  /* Pink-500 */
+  
+  /* UI Surface Colors */
+  --card-bg: rgba(24, 24, 27, 0.6); /* Translucent Zinc-900 */
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-card: var(--card-bg);
+  
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* 1. The "Aurora" Background Effect */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  
+  /* Creates a subtle top-center glow */
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+  background-attachment: fixed; /* Keeps glow in place while scrolling */
+}
+
+/* 2. Glassmorphism Utilities (Use class="glass" on your cards) */
+.glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 3. Custom Scrollbar (Sleek & Thin) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a; /* Zinc-800 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46; /* Zinc-700 */
+}
+
+/* 4. Text Selection Color */
+::selection {
+  background: rgba(139, 92, 246, 0.3); /* Purple tint */
+  color: #fff;
+}
