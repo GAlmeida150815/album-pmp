@@ -13,7 +13,14 @@ import {
   doc,
   Timestamp,
 } from "firebase/firestore";
-import { Search, Loader2, ArrowLeft, Trash2 } from "lucide-react";
+import {
+  Search,
+  Loader2,
+  ArrowLeft,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import AlbumCard from "@/components/AlbumCard";
 import type { Album } from "@/interfaces/Album";
 import type {
@@ -22,6 +29,8 @@ import type {
   ItunesTrack,
 } from "@/interfaces/Itunes";
 import PageLoader from "@/components/PageLoader";
+
+const ITEMS_PER_PAGE = 4;
 
 export default function AddAlbumPage() {
   const { user, loading: userLoading } = useUser();
@@ -32,6 +41,8 @@ export default function AddAlbumPage() {
   const [results, setResults] = useState<Album[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [existingAlbum, setExistingAlbum] = useState<Album | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -57,6 +68,8 @@ export default function AddAlbumPage() {
   const handleSearch = async () => {
     if (!queryInput.trim() || !user) return;
     setIsSearching(true);
+    setCurrentPage(1); // Reset para a primeira página numa nova pesquisa
+
     try {
       const res = await fetch(
         `/api/search?q=${encodeURIComponent(queryInput)}`,
@@ -161,9 +174,24 @@ export default function AddAlbumPage() {
       setExistingAlbum(null);
     } catch (e) {
       console.error(e);
-      alert("Could not delete.");
+      alert("Não foi possível apagar.");
     }
     setIsDeleting(false);
+  };
+
+  // --- Lógica de Paginação ---
+  const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
+  const currentResults = results.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
 
   if (loading || userLoading) return <PageLoader />;
@@ -207,7 +235,7 @@ export default function AddAlbumPage() {
 
   return (
     <div className='min-h-screen bg-black text-white p-6'>
-      <div className='max-w-2xl mx-auto'>
+      <div className='max-w-6xl mx-auto'>
         <button
           onClick={() => router.back()}
           className='flex items-center text-gray-400 hover:text-white mb-6'
@@ -220,6 +248,7 @@ export default function AddAlbumPage() {
           Pesquisa na Apple Music. Escolhe com sabedoria.
         </p>
 
+        {/* Barra de Pesquisa */}
         <div className='flex gap-3 mb-10'>
           <div className='relative flex-1'>
             <Search
@@ -230,7 +259,7 @@ export default function AddAlbumPage() {
               value={queryInput}
               onChange={(e) => setQueryInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              placeholder='Search...'
+              placeholder='Pesquisar...'
               className='w-full bg-gray-900 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-purple-500'
             />
           </div>
@@ -239,19 +268,46 @@ export default function AddAlbumPage() {
             disabled={isSearching}
             className='bg-white text-black px-8 rounded-xl font-bold'
           >
-            {isSearching ? <Loader2 className='animate-spin' /> : "Search"}
+            {isSearching ? <Loader2 className='animate-spin' /> : "Pesquisar"}
           </button>
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          {results.map((album) => (
+        {/* Grelha de Resultados */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-12'>
+          {currentResults.map((album) => (
             <AlbumCard
               key={album.id}
               album={album}
+              isSelection={true}
               onClick={() => selectAlbum(album)}
             />
           ))}
         </div>
+
+        {/* Paginação */}
+        {results.length > ITEMS_PER_PAGE && (
+          <div className='flex justify-center items-center gap-6 pb-20'>
+            <button
+              onClick={goToPrevPage}
+              disabled={currentPage === 1}
+              className='p-3 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors'
+            >
+              <ChevronLeft size={24} />
+            </button>
+
+            <span className='font-mono text-gray-400'>
+              Página {currentPage} de {totalPages}
+            </span>
+
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className='p-3 rounded-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors'
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

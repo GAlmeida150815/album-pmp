@@ -7,10 +7,12 @@ import Image from "next/image";
 export default function AlbumCard({
   album,
   rating,
+  isSelection,
   onClick,
 }: {
   album: Album;
   rating?: number | null;
+  isSelection?: boolean | false;
   onClick?: () => void;
 }) {
   const router = useRouter();
@@ -63,14 +65,16 @@ export default function AlbumCard({
       </div>
 
       {/* User Badge */}
-      <div className='flex justify-between items-center border-t border-white/10 pt-3 mt-3'>
-        <span className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
-          Sugerido Por
-        </span>
-        <span className='text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded border border-purple-500/20'>
-          {album.submittedBy}
-        </span>
-      </div>
+      {isSelection ? null : (
+        <div className='flex justify-between items-center border-t border-white/10 pt-3 mt-3'>
+          <span className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
+            Sugerido Por
+          </span>
+          <span className='text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-1 rounded border border-purple-500/20'>
+            {album.submittedBy}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
