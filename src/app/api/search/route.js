@@ -6,7 +6,7 @@ export async function GET(request) {
   
   if (!query) return NextResponse.json({ error: 'Missing query' }, { status: 400 });
   try {
-     const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5`);
+     const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album`);
 
     if (!res.ok) {
       throw new Error('Failed to fetch from iTunes');
